@@ -1,29 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { LeftPanel } from "@/components/builder/LeftPanel";
+import { CenterPanel } from "@/components/builder/CenterPanel";
+import { RightPanel } from "@/components/builder/RightPanel";
+import "@/lib/templateEngine";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "BuildForge Studio — 3D Website Template Builder" },
+      { name: "description", content: "Browse 100 industry templates and customize a live 3D website preview in real time." },
+      { property: "og:title", content: "BuildForge Studio" },
+      { property: "og:description", content: "3D website template builder with 100 industry-specific designs." },
     ],
   }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="flex h-screen w-screen overflow-hidden">
+      <LeftPanel />
+      <CenterPanel />
+      <RightPanel />
     </div>
   );
 }
