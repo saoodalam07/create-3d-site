@@ -32,8 +32,11 @@ const state: EngineState = {
   customizations: {},
 };
 
+let snapshot: EngineState = { ...state, templateHistory: [...state.templateHistory] };
+
 function emit() {
-  for (const l of listeners) l({ ...state, templateHistory: [...state.templateHistory] });
+  snapshot = { ...state, templateHistory: [...state.templateHistory], customizations: { ...state.customizations } };
+  for (const l of listeners) l(snapshot);
 }
 
 export function subscribe(l: Listener): () => void {
@@ -42,7 +45,7 @@ export function subscribe(l: Listener): () => void {
 }
 
 export function getState(): EngineState {
-  return { ...state, templateHistory: [...state.templateHistory] };
+  return snapshot;
 }
 
 export function apply(templateId: string) {
