@@ -108,8 +108,11 @@ export function RightPanel() {
 
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div>
-      <div className="text-[10px] uppercase tracking-wider text-[var(--panel-muted)] mb-2">{label}</div>
+    <div className="bf-card">
+      <div className="text-[10px] uppercase tracking-wider text-[var(--panel-muted)] mb-2 flex items-center gap-2">
+        <span className="w-1 h-3 rounded-full" style={{ background: "var(--gradient-primary)" }} />
+        {label}
+      </div>
       <div className="space-y-2">{children}</div>
     </div>
   );
