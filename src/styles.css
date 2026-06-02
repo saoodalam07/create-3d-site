@@ -304,3 +304,17 @@
   .bf-char, .bf-morph, .bf-section-rise { animation-duration: 0.01ms !important; }
   .bf-tilt { transform: none !important; }
 }
+
+@keyframes bf-kenburns {
+  0%   { transform: scale(1.05) translate3d(0,0,0); }
+  100% { transform: scale(1.18) translate3d(-2%, -1%, 0); }
+}
+
+/* Modern panel card */
+.bf-card {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--panel-elevated) 70%, transparent), color-mix(in oklab, var(--panel-elevated) 30%, transparent));
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 12px;
+  backdrop-filter: blur(6px);
+}
