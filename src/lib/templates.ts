@@ -8,7 +8,9 @@ export type BackgroundType =
   | "aurora"
   | "floating-shapes"
   | "video-loop"
-  | "noise-grid";
+  | "noise-grid"
+  | "construction-3d"
+  | "waterfall-3d";
 export type ScrollAnimation =
   | "depth-rise"
   | "perspective-reveal"
