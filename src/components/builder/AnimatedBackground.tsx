@@ -141,10 +141,22 @@ function ConstructionBg({ primary, secondary, accent }: { primary: string; secon
   const sparks = Array.from({ length: 22 }, (_, i) => i);
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: `linear-gradient(180deg, ${primary}22 0%, ${secondary}33 60%, ${accent}22 100%)` }}>
+      {/* Real construction site photo */}
+      <img
+        src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80"
+        alt=""
+        aria-hidden
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ animation: "bf-kenburns 22s ease-in-out infinite alternate" }}
+      />
+      {/* Tonal color wash to blend with template palette */}
+      <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${primary}66 0%, ${secondary}55 55%, ${accent}66 100%)`, mixBlendMode: "multiply" }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 50% 110%, ${accent}55, transparent 60%)` }} />
+
       {/* Sun / glow */}
       <div className="absolute" style={{ top: "12%", right: "14%", width: 120, height: 120, borderRadius: "50%", background: `radial-gradient(circle, ${accent}99, transparent 70%)`, filter: "blur(6px)" }} />
 
-      {/* Skyline buildings rising */}
+      {/* Crane + workers overlay on top of the photo */}
       <svg className="absolute inset-x-0 bottom-0 w-full" viewBox="0 0 800 400" preserveAspectRatio="none" style={{ height: "75%" }}>
         <defs>
           <linearGradient id="bldg1" x1="0" y1="0" x2="0" y2="1">
@@ -156,31 +168,6 @@ function ConstructionBg({ primary, secondary, accent }: { primary: string; secon
             <stop offset="100%" stopColor={primary} stopOpacity="0.85" />
           </linearGradient>
         </defs>
-        {/* Back buildings */}
-        <g style={{ transformOrigin: "center bottom", animation: "bf-bld-rise 2.4s cubic-bezier(.2,.8,.2,1) backwards" }}>
-          <rect x="40" y="180" width="80" height="220" fill="url(#bldg2)" opacity="0.7" />
-          <rect x="140" y="120" width="70" height="280" fill="url(#bldg1)" opacity="0.75" />
-          <rect x="230" y="160" width="90" height="240" fill="url(#bldg2)" opacity="0.7" />
-          <rect x="600" y="140" width="80" height="260" fill="url(#bldg1)" opacity="0.7" />
-          <rect x="700" y="190" width="60" height="210" fill="url(#bldg2)" opacity="0.7" />
-        </g>
-        {/* Window grid */}
-        <g fill={accent} opacity="0.55">
-          {Array.from({ length: 7 }).map((_, r) => Array.from({ length: 4 }).map((__, c) => (
-            <rect key={`w-${r}-${c}`} x={150 + c * 16} y={140 + r * 32} width="6" height="10" />
-          )))}
-        </g>
-        {/* Front building under construction with scaffold */}
-        <g style={{ animation: "bf-bld-rise 2.8s cubic-bezier(.2,.8,.2,1) 200ms backwards" }}>
-          <rect x="360" y="100" width="180" height="300" fill="url(#bldg1)" />
-          {/* scaffold poles */}
-          {[0,1,2,3,4].map((i) => (
-            <line key={`p-${i}`} x1={370 + i*42} y1={100} x2={370 + i*42} y2={400} stroke={accent} strokeWidth="2" opacity="0.7" />
-          ))}
-          {[0,1,2,3,4,5].map((i) => (
-            <line key={`h-${i}`} x1={360} y1={130 + i*46} x2={540} y2={130 + i*46} stroke={accent} strokeWidth="1.5" opacity="0.6" />
-          ))}
-        </g>
         {/* Crane */}
         <g style={{ transformOrigin: "560px 400px", animation: "bf-crane-sway 6s ease-in-out infinite" }}>
           <line x1="560" y1="400" x2="560" y2="60" stroke={accent} strokeWidth="5" />
@@ -191,8 +178,6 @@ function ConstructionBg({ primary, secondary, accent }: { primary: string; secon
           <line x1="700" y1="60" x2="700" y2="180" stroke={accent} strokeWidth="1.5" style={{ animation: "bf-crane-hook 4s ease-in-out infinite" }} />
           <rect x="690" y="180" width="20" height="14" fill={primary} stroke={accent} strokeWidth="1" style={{ animation: "bf-crane-hook 4s ease-in-out infinite" }} />
         </g>
-        {/* Ground */}
-        <rect x="0" y="380" width="800" height="20" fill={secondary} opacity="0.9" />
         {/* Workers walking */}
         <g style={{ animation: "bf-worker-walk 9s linear infinite" }}>
           <Worker x={120} primary={accent} secondary={primary} />
@@ -246,11 +231,16 @@ function WaterfallBg({ primary, secondary, accent, density }: { primary: string;
   const drops = Array.from({ length: Math.max(40, Math.min(density, 200)) }, (_, i) => i);
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: `linear-gradient(180deg, ${primary}33 0%, ${secondary}44 50%, ${accent}55 100%)` }}>
-      {/* Cliff silhouette */}
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 600" preserveAspectRatio="none">
-        <path d="M0,260 L260,260 L300,300 L500,300 L540,260 L800,260 L800,600 L0,600 Z" fill={primary} opacity="0.45" />
-        <path d="M0,320 L220,320 L260,360 L540,360 L580,320 L800,320 L800,600 L0,600 Z" fill={secondary} opacity="0.55" />
-      </svg>
+      {/* Real waterfall photo */}
+      <img
+        src="https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=1600&q=80"
+        alt=""
+        aria-hidden
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ animation: "bf-kenburns 24s ease-in-out infinite alternate" }}
+      />
+      <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${primary}55 0%, ${secondary}44 45%, ${accent}66 100%)`, mixBlendMode: "screen" }} />
+      <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, transparent 60%, ${primary}99 100%)` }} />
       {/* Falling water streaks */}
       {drops.map((i) => {
         const left = 32 + ((i * 7) % 38);
