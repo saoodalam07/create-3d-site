@@ -15,6 +15,8 @@ export function AnimatedBackground({ type, primary, secondary, accent, density =
   if (type === "floating-shapes") return <FloatingShapesBg primary={primary} accent={accent} />;
   if (type === "geometric-mesh") return <GeometricMeshBg primary={primary} secondary={secondary} />;
   if (type === "noise-grid") return <NoiseGridBg primary={primary} accent={accent} />;
+  if (type === "construction-3d") return <ConstructionBg primary={primary} secondary={secondary} accent={accent} />;
+  if (type === "waterfall-3d") return <WaterfallBg primary={primary} secondary={secondary} accent={accent} density={density} />;
   if (type === "video-loop") return <AuroraBg primary={primary} secondary={secondary} accent={accent} />;
   return null;
 }
@@ -129,6 +131,151 @@ function NoiseGridBg({ primary, accent }: { primary: string; accent: string }) {
     <div className="absolute inset-0 grid" style={{ gridTemplateColumns: "repeat(20, 1fr)", background: `linear-gradient(135deg, ${primary}22, ${accent}22)` }}>
       {cells.map((i) => (
         <div key={i} style={{ background: i % 2 ? primary : accent, opacity: ((i * 13) % 30) / 100, animation: `bf-drift ${4 + (i%5)}s ease-in-out infinite`, animationDelay: `${(i % 20) * 0.1}s` }} />
+      ))}
+    </div>
+  );
+}
+
+function ConstructionBg({ primary, secondary, accent }: { primary: string; secondary: string; accent: string }) {
+  // Animated SVG construction site — rising buildings, swinging crane, walking workers, sparks
+  const sparks = Array.from({ length: 22 }, (_, i) => i);
+  return (
+    <div className="absolute inset-0 overflow-hidden" style={{ background: `linear-gradient(180deg, ${primary}22 0%, ${secondary}33 60%, ${accent}22 100%)` }}>
+      {/* Sun / glow */}
+      <div className="absolute" style={{ top: "12%", right: "14%", width: 120, height: 120, borderRadius: "50%", background: `radial-gradient(circle, ${accent}99, transparent 70%)`, filter: "blur(6px)" }} />
+
+      {/* Skyline buildings rising */}
+      <svg className="absolute inset-x-0 bottom-0 w-full" viewBox="0 0 800 400" preserveAspectRatio="none" style={{ height: "75%" }}>
+        <defs>
+          <linearGradient id="bldg1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={primary} stopOpacity="0.95" />
+            <stop offset="100%" stopColor={secondary} stopOpacity="0.9" />
+          </linearGradient>
+          <linearGradient id="bldg2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={secondary} stopOpacity="0.9" />
+            <stop offset="100%" stopColor={primary} stopOpacity="0.85" />
+          </linearGradient>
+        </defs>
+        {/* Back buildings */}
+        <g style={{ transformOrigin: "center bottom", animation: "bf-bld-rise 2.4s cubic-bezier(.2,.8,.2,1) backwards" }}>
+          <rect x="40" y="180" width="80" height="220" fill="url(#bldg2)" opacity="0.7" />
+          <rect x="140" y="120" width="70" height="280" fill="url(#bldg1)" opacity="0.75" />
+          <rect x="230" y="160" width="90" height="240" fill="url(#bldg2)" opacity="0.7" />
+          <rect x="600" y="140" width="80" height="260" fill="url(#bldg1)" opacity="0.7" />
+          <rect x="700" y="190" width="60" height="210" fill="url(#bldg2)" opacity="0.7" />
+        </g>
+        {/* Window grid */}
+        <g fill={accent} opacity="0.55">
+          {Array.from({ length: 7 }).map((_, r) => Array.from({ length: 4 }).map((__, c) => (
+            <rect key={`w-${r}-${c}`} x={150 + c * 16} y={140 + r * 32} width="6" height="10" />
+          )))}
+        </g>
+        {/* Front building under construction with scaffold */}
+        <g style={{ animation: "bf-bld-rise 2.8s cubic-bezier(.2,.8,.2,1) 200ms backwards" }}>
+          <rect x="360" y="100" width="180" height="300" fill="url(#bldg1)" />
+          {/* scaffold poles */}
+          {[0,1,2,3,4].map((i) => (
+            <line key={`p-${i}`} x1={370 + i*42} y1={100} x2={370 + i*42} y2={400} stroke={accent} strokeWidth="2" opacity="0.7" />
+          ))}
+          {[0,1,2,3,4,5].map((i) => (
+            <line key={`h-${i}`} x1={360} y1={130 + i*46} x2={540} y2={130 + i*46} stroke={accent} strokeWidth="1.5" opacity="0.6" />
+          ))}
+        </g>
+        {/* Crane */}
+        <g style={{ transformOrigin: "560px 400px", animation: "bf-crane-sway 6s ease-in-out infinite" }}>
+          <line x1="560" y1="400" x2="560" y2="60" stroke={accent} strokeWidth="5" />
+          <line x1="560" y1="60" x2="760" y2="60" stroke={accent} strokeWidth="5" />
+          <line x1="560" y1="60" x2="460" y2="60" stroke={accent} strokeWidth="3" />
+          <line x1="560" y1="60" x2="560" y2="35" stroke={accent} strokeWidth="2" />
+          {/* Hook line */}
+          <line x1="700" y1="60" x2="700" y2="180" stroke={accent} strokeWidth="1.5" style={{ animation: "bf-crane-hook 4s ease-in-out infinite" }} />
+          <rect x="690" y="180" width="20" height="14" fill={primary} stroke={accent} strokeWidth="1" style={{ animation: "bf-crane-hook 4s ease-in-out infinite" }} />
+        </g>
+        {/* Ground */}
+        <rect x="0" y="380" width="800" height="20" fill={secondary} opacity="0.9" />
+        {/* Workers walking */}
+        <g style={{ animation: "bf-worker-walk 9s linear infinite" }}>
+          <Worker x={120} primary={accent} secondary={primary} />
+          <Worker x={260} primary={accent} secondary={primary} />
+          <Worker x={470} primary={accent} secondary={primary} />
+        </g>
+      </svg>
+
+      {/* Welding sparks falling */}
+      {sparks.map((i) => {
+        const left = (i * 47) % 100;
+        const delay = (i % 7) * 0.4;
+        const dur = 2 + (i % 4) * 0.6;
+        return (
+          <span key={i} className="absolute pointer-events-none" style={{
+            left: `${left}%`, top: "30%", width: 3, height: 3, borderRadius: "50%",
+            background: accent, boxShadow: `0 0 6px ${accent}`,
+            animation: `bf-spark-fall ${dur}s ease-in ${delay}s infinite`,
+          }} />
+        );
+      })}
+
+      {/* Dust haze */}
+      <div className="absolute inset-x-0 bottom-0 h-24" style={{ background: `linear-gradient(0deg, ${secondary}66, transparent)`, animation: "bf-dust 6s ease-in-out infinite" }} />
+    </div>
+  );
+}
+
+function Worker({ x, primary, secondary }: { x: number; primary: string; secondary: string }) {
+  return (
+    <g transform={`translate(${x}, 360)`}>
+      {/* helmet */}
+      <circle cx="0" cy="-2" r="5" fill={primary} />
+      <rect x="-5" y="2" width="10" height="2" fill={primary} />
+      {/* body */}
+      <rect x="-4" y="4" width="8" height="10" fill={secondary} />
+      {/* legs */}
+      <g style={{ transformOrigin: "0 14px", animation: "bf-leg-1 0.7s ease-in-out infinite" }}>
+        <rect x="-4" y="14" width="3" height="8" fill={primary} />
+      </g>
+      <g style={{ transformOrigin: "0 14px", animation: "bf-leg-2 0.7s ease-in-out infinite" }}>
+        <rect x="1" y="14" width="3" height="8" fill={primary} />
+      </g>
+      {/* arm with tool */}
+      <rect x="3" y="6" width="2" height="8" fill={primary} style={{ transformOrigin: "4px 6px", animation: "bf-arm 0.5s ease-in-out infinite" }} />
+    </g>
+  );
+}
+
+function WaterfallBg({ primary, secondary, accent, density }: { primary: string; secondary: string; accent: string; density: number }) {
+  const drops = Array.from({ length: Math.max(40, Math.min(density, 200)) }, (_, i) => i);
+  return (
+    <div className="absolute inset-0 overflow-hidden" style={{ background: `linear-gradient(180deg, ${primary}33 0%, ${secondary}44 50%, ${accent}55 100%)` }}>
+      {/* Cliff silhouette */}
+      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 600" preserveAspectRatio="none">
+        <path d="M0,260 L260,260 L300,300 L500,300 L540,260 L800,260 L800,600 L0,600 Z" fill={primary} opacity="0.45" />
+        <path d="M0,320 L220,320 L260,360 L540,360 L580,320 L800,320 L800,600 L0,600 Z" fill={secondary} opacity="0.55" />
+      </svg>
+      {/* Falling water streaks */}
+      {drops.map((i) => {
+        const left = 32 + ((i * 7) % 38);
+        const delay = (i % 12) * 0.15;
+        const dur = 1.2 + (i % 5) * 0.25;
+        const w = 2 + (i % 3);
+        return (
+          <span key={i} className="absolute" style={{
+            left: `${left}%`, top: "-10%", width: w, height: 80,
+            background: `linear-gradient(180deg, transparent, ${accent}, transparent)`,
+            opacity: 0.7, borderRadius: 2,
+            animation: `bf-water-fall ${dur}s linear ${delay}s infinite`,
+            filter: "blur(0.5px)",
+          }} />
+        );
+      })}
+      {/* Mist at bottom */}
+      <div className="absolute inset-x-0 bottom-0 h-32" style={{ background: `radial-gradient(ellipse at center bottom, ${accent}aa, transparent 70%)`, animation: "bf-mist 4s ease-in-out infinite" }} />
+      {/* Ripples */}
+      {[0,1,2].map((i) => (
+        <span key={i} className="absolute rounded-full border" style={{
+          left: "50%", bottom: "8%", width: 80, height: 16, borderColor: accent, opacity: 0.5,
+          transform: "translateX(-50%)",
+          animation: `bf-ripple 3s ease-out ${i*1}s infinite`,
+        }} />
       ))}
     </div>
   );
