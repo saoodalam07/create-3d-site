@@ -1,10 +1,10 @@
 import { useEngineState } from "@/hooks/useTemplateEngine";
-import { getMergedTemplate, setCustomization, resetCustomization, undo } from "@/lib/templateEngine";
+import { getMergedTemplate, setCustomization, resetCustomization, undo, downloadHTML, previewHTML } from "@/lib/templateEngine";
 import type { BackgroundType } from "@/lib/templates";
-import { Undo2, RotateCcw, Wand2 } from "lucide-react";
+import { Undo2, RotateCcw, Wand2, Download, ExternalLink } from "lucide-react";
 
 const FONT_OPTIONS = ["Space Grotesk","Syne","Outfit","Sora","Urbanist","Instrument Serif","DM Serif Display","Cormorant","Bebas Neue","Archivo Black","Inter","DM Sans","Manrope","Work Sans","IBM Plex Sans","Karla","Nunito Sans","Hind","Cabin","Plus Jakarta Sans"];
-const BG_OPTIONS: BackgroundType[] = ["particle-network","geometric-mesh","aurora","floating-shapes","video-loop","noise-grid"];
+const BG_OPTIONS: BackgroundType[] = ["particle-network","geometric-mesh","aurora","floating-shapes","video-loop","noise-grid","construction-3d","waterfall-3d"];
 
 export function RightPanel() {
   const { activeTemplate, templateHistory } = useEngineState();
@@ -88,6 +88,19 @@ export function RightPanel() {
           Regenerate Content
         </button>
         <p className="text-[10px] text-[var(--panel-muted)] text-center -mt-3">AI generation arrives in the next iteration.</p>
+
+        <div className="pt-3 border-t border-[var(--panel-border)] space-y-2">
+          <div className="text-[10px] uppercase tracking-wider text-[var(--panel-muted)]">Apply to Website</div>
+          <button onClick={downloadHTML} className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md text-white text-sm font-semibold transition-transform hover:scale-[1.02]" style={{ background: `linear-gradient(135deg, ${t.primaryColor}, ${t.accentColor})` }}>
+            <Download className="w-4 h-4" />
+            Download HTML
+          </button>
+          <button onClick={previewHTML} className="w-full flex items-center justify-center gap-2 py-2 rounded-md text-xs font-medium border border-[var(--panel-border)] text-[var(--panel-foreground)] hover:bg-[var(--panel-hover)]">
+            <ExternalLink className="w-3.5 h-3.5" />
+            Open Live Preview
+          </button>
+          <p className="text-[10px] text-[var(--panel-muted)] text-center">All your colors, fonts &amp; sections baked in.</p>
+        </div>
       </div>
     </aside>
   );
