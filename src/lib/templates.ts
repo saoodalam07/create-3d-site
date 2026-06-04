@@ -10,7 +10,8 @@ export type BackgroundType =
   | "video-loop"
   | "noise-grid"
   | "construction-3d"
-  | "waterfall-3d";
+  | "waterfall-3d"
+  | "photo-parallax";
 export type ScrollAnimation =
   | "depth-rise"
   | "perspective-reveal"
@@ -40,6 +41,7 @@ export interface Template {
   ctaLabel: string;
   stats: { number: string; label: string }[];
   services: { name: string; description: string }[];
+  photos: string[];
 }
 
 export const INDUSTRIES = [
@@ -68,6 +70,72 @@ export const INDUSTRY_COLORS: Record<Industry, string> = {
   Energy: "#eab308",
   Retail: "#ec4899",
 };
+
+// Real-image pools per industry. Mix of curated Unsplash IDs that are reliably
+// available + an Unsplash Source fallback keyed by industry keywords so each
+// template gets a different photo set without us hand-curating 100 lists.
+const UNSPLASH_IDS: Record<Industry, string[]> = {
+  Construction: [
+    "1504307651254-35680f356dfd","1541888946425-d81bb19240f5","1581094271901-8022df4466f9",
+    "1590856029826-c7a73142bbf1","1503387762-cf4f0f5b0c45","1565008447742-97f6f38c985c",
+  ],
+  Architecture: [
+    "1487958449943-2429e8be8625","1431576901776-e539bd916ba2","1486325212027-8081e485255e",
+    "1449157291145-7efd050a4d0e","1460472178825-e5240623afd5","1503387837-b154d5074bd2",
+  ],
+  Tech: [
+    "1518770660439-4636190af475","1517694712202-14dd9538aa97","1531297484001-80022131f5a1",
+    "1551434678-e076c223a692","1581090464777-f3220bbe1b8b","1573164713988-8665fc963095",
+  ],
+  Healthcare: [
+    "1576091160399-112ba8d25d1d","1538108149393-fbbd81895907","1582719508461-905c673771fd",
+    "1559757148-5c350d0d3c56","1631815587646-b85a1bb027e1","1584820927498-cfe5211fd8bf",
+  ],
+  Finance: [
+    "1518186285589-2f7649de83e0","1565514020179-026b92b84bb6","1554224155-6726b3ff858f",
+    "1559526324-4b87b5e36e44","1543286386-713bdd548da4","1611974789855-9c2a0a7236a3",
+  ],
+  "Real Estate": [
+    "1564013799919-ab600027ffc6","1568605114967-8130f3a36994","1570129477492-45c003edd2be",
+    "1502672023488-70e25813eb80","1512917774080-9991f1c4c750","1494526585095-c41746248156",
+  ],
+  Education: [
+    "1503676260728-1c00da094a0b","1523580494863-6f3031224c94","1509062522246-3755977927d7",
+    "1517842645767-c639042777db","1546410531-bb4caa6b424d","1571260899304-425eee4c7efc",
+  ],
+  Manufacturing: [
+    "1565793298595-6a879b1d9492","1581091226825-a6a2a5aee158","1567789884554-0b844b597180",
+    "1504917595217-d4dc5ebe6122","1542838132-92c53300491e","1518709268805-4e9042af2176",
+  ],
+  Energy: [
+    "1466611653911-95081537e5b7","1509391366360-2e959784a276","1497435334941-8c899ee9e8e9",
+    "1473341304170-971dccb5ac1e","1518709268805-4e9042af2176","1542601906990-b4d3fb778b09",
+  ],
+  Retail: [
+    "1441986300917-64674bd600d8","1483985988355-763728e1935b","1490481651871-ab68de25d43d",
+    "1556905055-8f358a7a47b2","1567401893414-76b7b1e5a7a5","1521577352947-9bb58764b69a",
+  ],
+};
+const KEYWORDS: Record<Industry, string> = {
+  Construction: "construction,building,site,crane,worker",
+  Architecture: "architecture,modern-building",
+  Tech: "technology,computer,software",
+  Healthcare: "healthcare,medical,clinic",
+  Finance: "finance,office,city",
+  "Real Estate": "real-estate,house,interior",
+  Education: "education,classroom,books",
+  Manufacturing: "manufacturing,factory,machine",
+  Energy: "energy,solar,wind-turbine",
+  Retail: "retail,store,shop",
+};
+function photosFor(industry: Industry, idx: number): string[] {
+  const ids = UNSPLASH_IDS[industry];
+  const offset = idx % ids.length;
+  const rotated = [...ids.slice(offset), ...ids.slice(0, offset)];
+  const primary = rotated.slice(0, 4).map((id) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1200&q=80`);
+  const extra = `https://source.unsplash.com/1200x800/?${KEYWORDS[industry]}&sig=${idx + 1}`;
+  return [...primary, extra];
+}
 
 const MOODS: Record<Industry, string[]> = {
   Construction: ["heavy-civil","luxury-residential","green-sustainable","smart-building","industrial-warehouse","architectural-portfolio","demolition","modular-prefab","heritage-restoration","infrastructure-gov"],
@@ -183,6 +251,7 @@ function buildTemplate(industry: Industry, idx: number): Template {
       name: s,
       description: `${s} engineered for the ${mood.replace(/-/g," ")} segment — measurable outcomes, real timelines.`,
     })),
+    photos: photosFor(industry, idx),
   };
 }
 
