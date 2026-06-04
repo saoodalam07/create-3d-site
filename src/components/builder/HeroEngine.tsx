@@ -17,6 +17,7 @@ interface HeroProps {
   parallax: number;
   particleDensity: number;
   stats: { number: string; label: string }[];
+  photos?: string[];
 }
 
 export function HeroEngine(props: HeroProps) {
@@ -59,7 +60,7 @@ export function HeroEngine(props: HeroProps) {
   return (
     <div ref={sceneRef} className="relative bf-scene overflow-hidden" style={{ minHeight: 520, background: `linear-gradient(180deg, ${props.primary}11, ${props.secondary}11)` }}>
       <div className="absolute inset-0" style={{ transform: `translateZ(-200px) scale(${1 + props.parallax * 0.2})` }}>
-        <AnimatedBackground type={props.background} primary={props.primary} secondary={props.secondary} accent={props.accent} density={props.particleDensity} />
+        <AnimatedBackground type={props.background} primary={props.primary} secondary={props.secondary} accent={props.accent} density={props.particleDensity} photos={props.photos} />
       </div>
 
       <div ref={tiltRef} className="bf-tilt relative h-full flex flex-col items-center justify-center px-10 py-20 text-center" style={{ minHeight: 520 }}>
