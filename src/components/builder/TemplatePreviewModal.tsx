@@ -10,13 +10,7 @@ export function TemplatePreviewModal() {
   const incoming = TEMPLATES.find((t) => t.templateId === pendingTemplate);
   if (!incoming) return null;
 
-  const previewIncoming = () => {
-    // Open the incoming template's HTML in a new tab without applying.
-    const saved = sessionStorage.getItem("bf-pending") ?? "";
-    sessionStorage.setItem("bf-pending", saved);
-    confirmPreview();
-    setTimeout(() => previewHTML(), 50);
-  };
+  const previewIncoming = () => previewHTML(incoming.templateId);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
