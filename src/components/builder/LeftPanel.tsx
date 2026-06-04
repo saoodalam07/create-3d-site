@@ -1,9 +1,8 @@
 import { useMemo, useState } from "react";
 import { INDUSTRIES, TEMPLATES, type Industry, type Template } from "@/lib/templates";
-import { MiniPreview } from "./MiniPreview";
-import { apply } from "@/lib/templateEngine";
+import { previewTemplate } from "@/lib/templateEngine";
 import { useEngineState } from "@/hooks/useTemplateEngine";
-import { Search, Sparkles } from "lucide-react";
+import { Search, Sparkles, Eye } from "lucide-react";
 
 export function LeftPanel() {
   const [tab, setTab] = useState<Industry | "All">("All");
@@ -72,7 +71,7 @@ export function LeftPanel() {
           return (
             <button
               key={t.templateId}
-              onClick={() => apply(t.templateId)}
+              onClick={() => previewTemplate(t.templateId)}
               className={`bf-thumb-card relative w-full text-left rounded-lg p-2 border transition-all ${
                 active
                   ? "border-[var(--primary)] bg-[var(--panel-hover)]"
@@ -81,14 +80,12 @@ export function LeftPanel() {
               aria-label={`Apply template ${t.name}`}
             >
               <div className="relative h-[100px] mb-2 rounded-md overflow-hidden bg-black/40">
+                <img src={t.photos[0]} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
                 <div className="absolute inset-0 bf-thumb-3d">
-                  <MiniPreview t={t} />
+                  <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${t.primaryColor}55, transparent 60%, ${t.accentColor}66)` }} />
                 </div>
-                <div className="bf-thumb-apply absolute bottom-0 left-0 right-0 px-2 py-1 text-[10px] font-semibold text-white text-center" style={{ background: "var(--gradient-primary)" }}>
-                  Apply Template
-                </div>
-                <div className="bf-thumb-preview absolute top-1 right-1 text-[9px] px-1.5 py-0.5 rounded bg-black/60 text-white">
-                  Live Preview
+                <div className="bf-thumb-apply absolute bottom-0 left-0 right-0 px-2 py-1 text-[10px] font-semibold text-white text-center flex items-center justify-center gap-1" style={{ background: "var(--gradient-primary)" }}>
+                  <Eye className="w-3 h-3" /> Review &amp; Apply
                 </div>
               </div>
               <div className="flex items-center justify-between gap-2 mb-0.5">

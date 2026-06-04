@@ -318,3 +318,26 @@
   padding: 12px;
   backdrop-filter: blur(6px);
 }
+
+/* Construction-themed UI kit */
+.bf-caution-stripe {
+  height: 6px;
+  background-image: repeating-linear-gradient(135deg, #facc15 0 14px, #0a0a0a 14px 28px);
+  background-size: 40px 100%;
+}
+.bf-hex-btn {
+  height: 32px;
+  clip-path: polygon(8% 0, 92% 0, 100% 50%, 92% 100%, 8% 100%, 0 50%);
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.bf-hex-btn-lg {
+  border-radius: 10px;
+  clip-path: polygon(4% 0, 96% 0, 100% 50%, 96% 100%, 4% 100%, 0 50%);
+}
+
+/* Photo parallax */
+.bf-parallax-scene { perspective: 1200px; }
+.bf-parallax-layer { will-change: transform; }

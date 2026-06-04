@@ -7,18 +7,42 @@ interface Props {
   secondary: string;
   accent: string;
   density?: number;
+  photos?: string[];
 }
 
-export function AnimatedBackground({ type, primary, secondary, accent, density = 80 }: Props) {
+export function AnimatedBackground({ type, primary, secondary, accent, density = 80, photos = [] }: Props) {
   if (type === "aurora") return <AuroraBg primary={primary} secondary={secondary} accent={accent} />;
   if (type === "particle-network") return <ParticleBg color={primary} density={density} />;
   if (type === "floating-shapes") return <FloatingShapesBg primary={primary} accent={accent} />;
   if (type === "geometric-mesh") return <GeometricMeshBg primary={primary} secondary={secondary} />;
   if (type === "noise-grid") return <NoiseGridBg primary={primary} accent={accent} />;
-  if (type === "construction-3d") return <ConstructionBg primary={primary} secondary={secondary} accent={accent} />;
+  if (type === "construction-3d") return <ConstructionBg primary={primary} secondary={secondary} accent={accent} photos={photos} />;
   if (type === "waterfall-3d") return <WaterfallBg primary={primary} secondary={secondary} accent={accent} density={density} />;
+  if (type === "photo-parallax") return <PhotoParallaxBg primary={primary} accent={accent} photos={photos} />;
   if (type === "video-loop") return <AuroraBg primary={primary} secondary={secondary} accent={accent} />;
   return null;
+}
+
+function PhotoParallaxBg({ primary, accent, photos }: { primary: string; accent: string; photos: string[] }) {
+  const pool = photos.length ? photos : ["https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80"];
+  const layers = [pool[0], pool[1 % pool.length], pool[2 % pool.length]];
+  return (
+    <div className="absolute inset-0 overflow-hidden bf-parallax-scene">
+      {layers.map((src, i) => (
+        <div key={i} className="absolute inset-0 bf-parallax-layer" style={{
+          backgroundImage: `url(${src})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.55 - i * 0.12,
+          filter: `blur(${i * 1.5}px) saturate(1.1)`,
+          transform: `translate3d(calc(var(--tilt-x, 0deg) * ${-2 - i * 2}), calc(var(--tilt-y, 0deg) * ${-2 - i * 2}), 0) scale(${1.08 + i * 0.04})`,
+          transition: "transform 600ms cubic-bezier(.22,1,.36,1)",
+          mixBlendMode: i === 0 ? "normal" : "screen",
+        }} />
+      ))}
+      <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${primary}55, transparent 60%, ${accent}66)` }} />
+    </div>
+  );
 }
 
 function AuroraBg({ primary, secondary, accent }: { primary: string; secondary: string; accent: string }) {
@@ -136,14 +160,15 @@ function NoiseGridBg({ primary, accent }: { primary: string; accent: string }) {
   );
 }
 
-function ConstructionBg({ primary, secondary, accent }: { primary: string; secondary: string; accent: string }) {
+function ConstructionBg({ primary, secondary, accent, photos }: { primary: string; secondary: string; accent: string; photos: string[] }) {
   // Animated SVG construction site — rising buildings, swinging crane, walking workers, sparks
   const sparks = Array.from({ length: 22 }, (_, i) => i);
+  const hero = photos[0] ?? "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80";
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: `linear-gradient(180deg, ${primary}22 0%, ${secondary}33 60%, ${accent}22 100%)` }}>
       {/* Real construction site photo */}
       <img
-        src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1600&q=80"
+        src={hero}
         alt=""
         aria-hidden
         className="absolute inset-0 w-full h-full object-cover"

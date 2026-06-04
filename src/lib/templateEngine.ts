@@ -14,12 +14,14 @@ export interface Customizations {
   headline?: string;
   subline?: string;
   ctaLabel?: string;
+  extraPhotos?: string[];
 }
 
 export interface EngineState {
   activeTemplate: string;
   templateHistory: string[];
   customizations: Record<string, Customizations>;
+  pendingTemplate: string | null;
 }
 
 type Listener = (s: EngineState) => void;
@@ -30,6 +32,7 @@ const state: EngineState = {
   activeTemplate: TEMPLATES[0].templateId,
   templateHistory: [TEMPLATES[0].templateId],
   customizations: {},
+  pendingTemplate: null,
 };
 
 let snapshot: EngineState = { ...state, templateHistory: [...state.templateHistory] };
@@ -53,6 +56,34 @@ export function apply(templateId: string) {
   if (state.activeTemplate === templateId) return;
   state.templateHistory = [...state.templateHistory, templateId].slice(-10);
   state.activeTemplate = templateId;
+  state.pendingTemplate = null;
+  emit();
+}
+
+export function previewTemplate(templateId: string) {
+  if (!TEMPLATES.find((t) => t.templateId === templateId)) return;
+  state.pendingTemplate = templateId;
+  emit();
+}
+export function cancelPreview() {
+  state.pendingTemplate = null;
+  emit();
+}
+export function confirmPreview() {
+  if (state.pendingTemplate) apply(state.pendingTemplate);
+}
+
+export function addPhoto(url: string) {
+  if (!url.trim()) return;
+  const id = state.activeTemplate;
+  const cur = state.customizations[id] ?? {};
+  state.customizations[id] = { ...cur, extraPhotos: [...(cur.extraPhotos ?? []), url.trim()] };
+  emit();
+}
+export function removePhoto(url: string) {
+  const id = state.activeTemplate;
+  const cur = state.customizations[id] ?? {};
+  state.customizations[id] = { ...cur, extraPhotos: (cur.extraPhotos ?? []).filter((u) => u !== url) };
   emit();
 }
 
@@ -76,11 +107,13 @@ export function resetCustomization(templateId: string) {
 export function getMergedTemplate(templateId?: string): Template & Customizations {
   const id = templateId ?? state.activeTemplate;
   const base = TEMPLATES.find((t) => t.templateId === id) ?? TEMPLATES[0];
-  return { ...base, ...(state.customizations[id] ?? {}) };
+  const cust = state.customizations[id] ?? {};
+  const photos = [...base.photos, ...(cust.extraPhotos ?? [])];
+  return { ...base, ...cust, photos };
 }
 
-export function exportHTML(): string {
-  const t = getMergedTemplate();
+export function exportHTML(templateId?: string): string {
+  const t = getMergedTemplate(templateId);
   const fontHref = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(t.headlineFont).replace(/%20/g,"+")}:wght@400;700&family=${encodeURIComponent(t.bodyFont).replace(/%20/g,"+")}:wght@400;600&display=swap`;
   const stats = t.stats.map((s) => `<div class="stat"><div class="num">${s.number}</div><div class="lbl">${s.label}</div></div>`).join("");
   const services = t.services.map((s, i) => `<div class="svc"><div class="svc-num">${String(i+1).padStart(2,"0")}</div><div class="svc-name">${s.name}</div><p>${s.description}</p></div>`).join("");
@@ -123,10 +156,10 @@ footer .cta{background:#fff;color:var(--p);box-shadow:none}
 </body></html>`;
 }
 
-export function downloadHTML() {
+export function downloadHTML(templateId?: string) {
   if (typeof window === "undefined") return;
-  const t = getMergedTemplate();
-  const blob = new Blob([exportHTML()], { type: "text/html;charset=utf-8" });
+  const t = getMergedTemplate(templateId);
+  const blob = new Blob([exportHTML(templateId)], { type: "text/html;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -135,9 +168,9 @@ export function downloadHTML() {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function previewHTML() {
+export function previewHTML(templateId?: string) {
   if (typeof window === "undefined") return;
-  const blob = new Blob([exportHTML()], { type: "text/html;charset=utf-8" });
+  const blob = new Blob([exportHTML(templateId)], { type: "text/html;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   window.open(url, "_blank", "noopener");
   setTimeout(() => URL.revokeObjectURL(url), 30000);

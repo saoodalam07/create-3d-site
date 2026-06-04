@@ -67,6 +67,7 @@ export function CenterPanel() {
               parallax={t.parallax ?? 0.5}
               particleDensity={t.particleDensity ?? 80}
               stats={t.stats}
+              photos={t.photos}
             />
 
             {t.sectionVisibility?.stats !== false && (
@@ -113,6 +114,22 @@ export function CenterPanel() {
                 </div>
               </section>
             )}
+
+            {/* Photo gallery — real pics from this template */}
+            <section className="px-10 py-12 bg-white border-t bf-section-rise" style={{ animationDelay: "210ms" }}>
+              <div className="flex items-end justify-between mb-4">
+                <h2 className="text-2xl font-bold" style={{ fontFamily: t.headlineFont }}>Recent Projects</h2>
+                <span className="text-[10px] uppercase tracking-widest text-slate-500">{t.photos.length} photos</span>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {t.photos.slice(0, 6).map((src, i) => (
+                  <div key={src + i} className="relative aspect-[4/3] rounded-xl overflow-hidden group">
+                    <img src={src} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: `linear-gradient(180deg, transparent, ${t.primaryColor}cc)` }} />
+                  </div>
+                ))}
+              </div>
+            </section>
 
             <footer className="px-10 py-10 text-white bf-section-rise" style={{ background: `linear-gradient(135deg, ${t.primaryColor}, ${t.secondaryColor})`, animationDelay: "240ms" }}>
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
