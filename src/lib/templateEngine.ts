@@ -112,8 +112,8 @@ export function getMergedTemplate(templateId?: string): Template & Customization
   return { ...base, ...cust, photos };
 }
 
-export function exportHTML(): string {
-  const t = getMergedTemplate();
+export function exportHTML(templateId?: string): string {
+  const t = getMergedTemplate(templateId);
   const fontHref = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(t.headlineFont).replace(/%20/g,"+")}:wght@400;700&family=${encodeURIComponent(t.bodyFont).replace(/%20/g,"+")}:wght@400;600&display=swap`;
   const stats = t.stats.map((s) => `<div class="stat"><div class="num">${s.number}</div><div class="lbl">${s.label}</div></div>`).join("");
   const services = t.services.map((s, i) => `<div class="svc"><div class="svc-num">${String(i+1).padStart(2,"0")}</div><div class="svc-name">${s.name}</div><p>${s.description}</p></div>`).join("");
@@ -156,10 +156,10 @@ footer .cta{background:#fff;color:var(--p);box-shadow:none}
 </body></html>`;
 }
 
-export function downloadHTML() {
+export function downloadHTML(templateId?: string) {
   if (typeof window === "undefined") return;
-  const t = getMergedTemplate();
-  const blob = new Blob([exportHTML()], { type: "text/html;charset=utf-8" });
+  const t = getMergedTemplate(templateId);
+  const blob = new Blob([exportHTML(templateId)], { type: "text/html;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -168,9 +168,9 @@ export function downloadHTML() {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function previewHTML() {
+export function previewHTML(templateId?: string) {
   if (typeof window === "undefined") return;
-  const blob = new Blob([exportHTML()], { type: "text/html;charset=utf-8" });
+  const blob = new Blob([exportHTML(templateId)], { type: "text/html;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   window.open(url, "_blank", "noopener");
   setTimeout(() => URL.revokeObjectURL(url), 30000);
