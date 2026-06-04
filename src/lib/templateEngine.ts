@@ -14,12 +14,14 @@ export interface Customizations {
   headline?: string;
   subline?: string;
   ctaLabel?: string;
+  extraPhotos?: string[];
 }
 
 export interface EngineState {
   activeTemplate: string;
   templateHistory: string[];
   customizations: Record<string, Customizations>;
+  pendingTemplate: string | null;
 }
 
 type Listener = (s: EngineState) => void;
@@ -30,6 +32,7 @@ const state: EngineState = {
   activeTemplate: TEMPLATES[0].templateId,
   templateHistory: [TEMPLATES[0].templateId],
   customizations: {},
+  pendingTemplate: null,
 };
 
 let snapshot: EngineState = { ...state, templateHistory: [...state.templateHistory] };
@@ -53,6 +56,34 @@ export function apply(templateId: string) {
   if (state.activeTemplate === templateId) return;
   state.templateHistory = [...state.templateHistory, templateId].slice(-10);
   state.activeTemplate = templateId;
+  state.pendingTemplate = null;
+  emit();
+}
+
+export function previewTemplate(templateId: string) {
+  if (!TEMPLATES.find((t) => t.templateId === templateId)) return;
+  state.pendingTemplate = templateId;
+  emit();
+}
+export function cancelPreview() {
+  state.pendingTemplate = null;
+  emit();
+}
+export function confirmPreview() {
+  if (state.pendingTemplate) apply(state.pendingTemplate);
+}
+
+export function addPhoto(url: string) {
+  if (!url.trim()) return;
+  const id = state.activeTemplate;
+  const cur = state.customizations[id] ?? {};
+  state.customizations[id] = { ...cur, extraPhotos: [...(cur.extraPhotos ?? []), url.trim()] };
+  emit();
+}
+export function removePhoto(url: string) {
+  const id = state.activeTemplate;
+  const cur = state.customizations[id] ?? {};
+  state.customizations[id] = { ...cur, extraPhotos: (cur.extraPhotos ?? []).filter((u) => u !== url) };
   emit();
 }
 
@@ -76,7 +107,9 @@ export function resetCustomization(templateId: string) {
 export function getMergedTemplate(templateId?: string): Template & Customizations {
   const id = templateId ?? state.activeTemplate;
   const base = TEMPLATES.find((t) => t.templateId === id) ?? TEMPLATES[0];
-  return { ...base, ...(state.customizations[id] ?? {}) };
+  const cust = state.customizations[id] ?? {};
+  const photos = [...base.photos, ...(cust.extraPhotos ?? [])];
+  return { ...base, ...cust, photos };
 }
 
 export function exportHTML(): string {
