@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { INDUSTRIES, TEMPLATES, type Industry, type Template } from "@/lib/templates";
-import { MiniPreview } from "./MiniPreview";
 import { previewTemplate } from "@/lib/templateEngine";
 import { useEngineState } from "@/hooks/useTemplateEngine";
 import { Search, Sparkles, Eye } from "lucide-react";
