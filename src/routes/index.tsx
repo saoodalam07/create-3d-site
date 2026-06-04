@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { LeftPanel } from "@/components/builder/LeftPanel";
 import { CenterPanel } from "@/components/builder/CenterPanel";
 import { RightPanel } from "@/components/builder/RightPanel";
+import { TemplatePreviewModal } from "@/components/builder/TemplatePreviewModal";
 import "@/lib/templateEngine";
 
 export const Route = createFileRoute("/")({
@@ -22,6 +23,7 @@ function Index() {
       <LeftPanel />
       <CenterPanel />
       <RightPanel />
+      <TemplatePreviewModal />
     </div>
   );
 }
