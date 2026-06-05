@@ -11,7 +11,12 @@ export type BackgroundType =
   | "noise-grid"
   | "construction-3d"
   | "waterfall-3d"
-  | "photo-parallax";
+  | "photo-parallax"
+  | "isometric-city"
+  | "neon-grid"
+  | "blueprint"
+  | "skyline-night"
+  | "custom-image";
 export type ScrollAnimation =
   | "depth-rise"
   | "perspective-reveal"
