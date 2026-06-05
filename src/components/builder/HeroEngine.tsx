@@ -18,6 +18,8 @@ interface HeroProps {
   particleDensity: number;
   stats: { number: string; label: string }[];
   photos?: string[];
+  customImage?: string;
+  buttonStyle?: "pill" | "hex" | "square" | "neon" | "glass" | "split";
 }
 
 export function HeroEngine(props: HeroProps) {
@@ -60,7 +62,7 @@ export function HeroEngine(props: HeroProps) {
   return (
     <div ref={sceneRef} className="relative bf-scene overflow-hidden" style={{ minHeight: 520, background: `linear-gradient(180deg, ${props.primary}11, ${props.secondary}11)` }}>
       <div className="absolute inset-0" style={{ transform: `translateZ(-200px) scale(${1 + props.parallax * 0.2})` }}>
-        <AnimatedBackground type={props.background} primary={props.primary} secondary={props.secondary} accent={props.accent} density={props.particleDensity} photos={props.photos} />
+        <AnimatedBackground type={props.background} primary={props.primary} secondary={props.secondary} accent={props.accent} density={props.particleDensity} photos={props.photos} customImage={props.customImage} />
       </div>
 
       <div ref={tiltRef} className="bf-tilt relative h-full flex flex-col items-center justify-center px-10 py-20 text-center" style={{ minHeight: 520 }}>
@@ -74,13 +76,7 @@ export function HeroEngine(props: HeroProps) {
 
         <div className="relative z-10 bf-glass px-8 py-6 max-w-xl" style={{ transform: "translateZ(40px)", background: "rgba(255,255,255,0.55)" }}>
           <p className="text-base md:text-lg text-slate-700 mb-5" style={{ fontFamily: props.bodyFont }}>{props.subline}</p>
-          <button
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-white font-semibold shadow-lg transition-transform hover:scale-105"
-            style={{ background: `linear-gradient(135deg, ${props.primary}, ${props.accent})`, boxShadow: `0 12px 32px -8px ${props.primary}88` }}
-          >
-            {props.ctaLabel}
-            <span aria-hidden>→</span>
-          </button>
+          <StyledCTA label={props.ctaLabel} primary={props.primary} accent={props.accent} style={props.buttonStyle ?? "pill"} />
         </div>
 
         <div className="absolute right-6 top-6 z-20 bf-glass px-4 py-3 hidden md:block" style={{ transform: "translateZ(120px)", background: "rgba(255,255,255,0.75)" }}>
@@ -94,4 +90,24 @@ export function HeroEngine(props: HeroProps) {
       </div>
     </div>
   );
+}
+
+export function StyledCTA({ label, primary, accent, style }: { label: string; primary: string; accent: string; style: "pill" | "hex" | "square" | "neon" | "glass" | "split" }) {
+  const base = "inline-flex items-center gap-2 px-6 py-3 text-white font-semibold transition-all duration-200 hover:scale-105";
+  if (style === "hex")
+    return <button className={`${base} bf-hex-btn-lg`} style={{ background: `linear-gradient(135deg, ${primary}, ${accent})`, boxShadow: `0 12px 32px -8px ${primary}88`, height: 48, minWidth: 180 }}>{label} <span aria-hidden>→</span></button>;
+  if (style === "square")
+    return <button className={`${base} rounded-none border-b-4`} style={{ background: primary, borderColor: accent, boxShadow: `6px 6px 0 0 ${accent}` }}>{label} <span aria-hidden>→</span></button>;
+  if (style === "neon")
+    return <button className={`${base} rounded-full border-2`} style={{ background: "transparent", color: accent, borderColor: accent, boxShadow: `0 0 18px ${accent}, inset 0 0 12px ${accent}66`, textShadow: `0 0 6px ${accent}` }}>{label} <span aria-hidden>→</span></button>;
+  if (style === "glass")
+    return <button className={`${base} rounded-2xl border backdrop-blur-md`} style={{ background: "rgba(255,255,255,0.18)", borderColor: "rgba(255,255,255,0.35)", color: "#0f172a", boxShadow: `0 16px 40px -10px ${primary}66` }}>{label} <span aria-hidden>→</span></button>;
+  if (style === "split")
+    return (
+      <span className="inline-flex rounded-full overflow-hidden shadow-lg" style={{ boxShadow: `0 12px 32px -8px ${primary}88` }}>
+        <button className="px-5 py-3 text-white font-semibold" style={{ background: primary }}>{label}</button>
+        <button aria-label="More" className="px-4 py-3 text-white font-bold" style={{ background: accent }}>→</button>
+      </span>
+    );
+  return <button className={`${base} rounded-full shadow-lg`} style={{ background: `linear-gradient(135deg, ${primary}, ${accent})`, boxShadow: `0 12px 32px -8px ${primary}88` }}>{label} <span aria-hidden>→</span></button>;
 }

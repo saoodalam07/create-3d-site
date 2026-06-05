@@ -341,3 +341,28 @@
 /* Photo parallax */
 .bf-parallax-scene { perspective: 1200px; }
 .bf-parallax-layer { will-change: transform; }
+
+/* Grid scroll for neon-grid bg */
+@keyframes bf-grid-scroll {
+  0% { background-position: 0 0, 0 0; }
+  100% { background-position: 0 50px, 50px 0; }
+}
+
+/* Real-world scrollable 3D world */
+.bf-world { perspective: 1600px; perspective-origin: 50% 0%; transform-style: preserve-3d; }
+.bf-tier { transform: translateZ(0); transition: transform .5s cubic-bezier(.22,1,.36,1); }
+.bf-tier:hover { transform: translateZ(20px); }
+
+.bf-deck { transform-style: preserve-3d; }
+.bf-3d-card {
+  transform-style: preserve-3d;
+  transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s ease;
+  will-change: transform;
+}
+.bf-3d-card:hover {
+  transform: translateY(-8px) rotateX(6deg) rotateY(-4deg) translateZ(30px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bf-3d-card, .bf-tier { transition: none !important; transform: none !important; }
+}

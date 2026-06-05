@@ -8,9 +8,15 @@ interface Props {
   accent: string;
   density?: number;
   photos?: string[];
+  customImage?: string;
 }
 
-export function AnimatedBackground({ type, primary, secondary, accent, density = 80, photos = [] }: Props) {
+export function AnimatedBackground({ type, primary, secondary, accent, density = 80, photos = [], customImage }: Props) {
+  if (type === "custom-image" && customImage) return <CustomImageBg src={customImage} primary={primary} accent={accent} />;
+  if (type === "isometric-city") return <IsometricCityBg primary={primary} secondary={secondary} accent={accent} />;
+  if (type === "neon-grid") return <NeonGridBg primary={primary} accent={accent} />;
+  if (type === "blueprint") return <BlueprintBg primary={primary} accent={accent} />;
+  if (type === "skyline-night") return <SkylineNightBg primary={primary} secondary={secondary} accent={accent} />;
   if (type === "aurora") return <AuroraBg primary={primary} secondary={secondary} accent={accent} />;
   if (type === "particle-network") return <ParticleBg color={primary} density={density} />;
   if (type === "floating-shapes") return <FloatingShapesBg primary={primary} accent={accent} />;
@@ -21,6 +27,109 @@ export function AnimatedBackground({ type, primary, secondary, accent, density =
   if (type === "photo-parallax") return <PhotoParallaxBg primary={primary} accent={accent} photos={photos} />;
   if (type === "video-loop") return <AuroraBg primary={primary} secondary={secondary} accent={accent} />;
   return null;
+}
+
+function CustomImageBg({ src, primary, accent }: { src: string; primary: string; accent: string }) {
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <img src={src} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover" style={{ animation: "bf-kenburns 22s ease-in-out infinite alternate" }} />
+      <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${primary}77, transparent 55%, ${accent}88)`, mixBlendMode: "multiply" }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 50% 100%, ${accent}66, transparent 70%)` }} />
+    </div>
+  );
+}
+
+function IsometricCityBg({ primary, secondary, accent }: { primary: string; secondary: string; accent: string }) {
+  const blocks = Array.from({ length: 18 }, (_, i) => i);
+  return (
+    <div className="absolute inset-0 overflow-hidden" style={{ background: `linear-gradient(160deg, ${primary}22, ${secondary}33 50%, ${accent}22)` }}>
+      <div className="absolute inset-0" style={{ perspective: "1400px" }}>
+        <div className="absolute left-1/2 top-1/2" style={{ transform: "translate(-50%,-30%) rotateX(58deg) rotateZ(-30deg)", transformStyle: "preserve-3d" }}>
+          {blocks.map((i) => {
+            const x = ((i % 6) - 3) * 90;
+            const y = (Math.floor(i / 6) - 1) * 90;
+            const h = 60 + ((i * 37) % 140);
+            const c = i % 3 === 0 ? primary : i % 3 === 1 ? secondary : accent;
+            return (
+              <div key={i} className="absolute" style={{
+                left: x, top: y, width: 70, height: 70,
+                background: c, opacity: 0.85,
+                boxShadow: `0 ${h}px 0 -8px ${c}cc, 0 0 30px ${c}55`,
+                transform: `translateZ(${h/2}px)`,
+                animation: `bf-bld-rise ${4 + (i%5)}s ease-in-out infinite alternate`,
+                animationDelay: `${(i%5)*0.3}s`,
+              }} />
+            );
+          })}
+        </div>
+      </div>
+      <div className="absolute inset-x-0 bottom-0 h-1/3" style={{ background: `linear-gradient(0deg, ${primary}99, transparent)` }} />
+    </div>
+  );
+}
+
+function NeonGridBg({ primary, accent }: { primary: string; accent: string }) {
+  return (
+    <div className="absolute inset-0 overflow-hidden" style={{ background: `radial-gradient(ellipse at 50% 30%, ${primary}55, #05060f 75%)` }}>
+      <div className="absolute inset-x-0 bottom-0 h-2/3" style={{
+        backgroundImage: `linear-gradient(${accent}88 1px, transparent 1px), linear-gradient(90deg, ${accent}88 1px, transparent 1px)`,
+        backgroundSize: "50px 50px",
+        transform: "perspective(600px) rotateX(60deg)",
+        transformOrigin: "bottom",
+        maskImage: "linear-gradient(0deg, #000 30%, transparent 100%)",
+        animation: "bf-grid-scroll 8s linear infinite",
+      }} />
+      <div className="absolute top-[18%] left-1/2 -translate-x-1/2 w-48 h-48 rounded-full" style={{ background: `radial-gradient(circle, ${accent}, ${primary} 40%, transparent 70%)`, filter: "blur(8px)", animation: "bf-aurora-1 6s ease-in-out infinite" }} />
+    </div>
+  );
+}
+
+function BlueprintBg({ primary, accent }: { primary: string; accent: string }) {
+  return (
+    <div className="absolute inset-0 overflow-hidden" style={{ background: primary }}>
+      <div className="absolute inset-0" style={{
+        backgroundImage: `linear-gradient(${accent}33 1px, transparent 1px), linear-gradient(90deg, ${accent}33 1px, transparent 1px), linear-gradient(${accent}22 1px, transparent 1px), linear-gradient(90deg, ${accent}22 1px, transparent 1px)`,
+        backgroundSize: "100px 100px, 100px 100px, 20px 20px, 20px 20px",
+      }} />
+      <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 800 600">
+        <g fill="none" stroke={accent} strokeWidth="1.5">
+          <rect x="120" y="200" width="220" height="260" />
+          <rect x="140" y="220" width="80" height="100" />
+          <rect x="240" y="220" width="80" height="100" />
+          <rect x="140" y="340" width="180" height="100" />
+          <line x1="120" y1="200" x2="340" y2="120" /><line x1="340" y1="200" x2="340" y2="120" />
+          <circle cx="500" cy="320" r="80" /><circle cx="500" cy="320" r="50" />
+          <line x1="420" y1="320" x2="580" y2="320" /><line x1="500" y1="240" x2="500" y2="400" />
+          <rect x="600" y="180" width="140" height="300" />
+          <line x1="600" y1="240" x2="740" y2="240" /><line x1="600" y1="300" x2="740" y2="300" />
+          <line x1="600" y1="360" x2="740" y2="360" /><line x1="600" y1="420" x2="740" y2="420" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function SkylineNightBg({ primary, secondary, accent }: { primary: string; secondary: string; accent: string }) {
+  const bldgs = Array.from({ length: 22 }, (_, i) => i);
+  return (
+    <div className="absolute inset-0 overflow-hidden" style={{ background: `linear-gradient(180deg, #0b1226 0%, ${primary}55 45%, ${secondary}77 100%)` }}>
+      <div className="absolute" style={{ top: "15%", right: "20%", width: 100, height: 100, borderRadius: "50%", background: `radial-gradient(circle, ${accent} 0%, transparent 65%)`, filter: "blur(6px)" }} />
+      <div className="absolute inset-x-0 bottom-0 flex items-end" style={{ height: "65%" }}>
+        {bldgs.map((i) => {
+          const h = 25 + ((i * 53) % 70);
+          const w = 28 + ((i * 7) % 22);
+          const c = i % 2 ? secondary : primary;
+          return (
+            <div key={i} className="relative" style={{ width: `${w}px`, height: `${h}%`, background: `linear-gradient(180deg, ${c}, #050816)`, marginRight: 2, boxShadow: `0 -8px 30px ${accent}33` }}>
+              {Array.from({ length: 6 }).map((_, j) => (
+                <span key={j} className="absolute" style={{ left: `${20 + j*15}%`, top: `${15 + (j*13)%60}%`, width: 3, height: 3, background: accent, opacity: ((i+j)%3)/3 + 0.3, boxShadow: `0 0 4px ${accent}` }} />
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 function PhotoParallaxBg({ primary, accent, photos }: { primary: string; accent: string; photos: string[] }) {

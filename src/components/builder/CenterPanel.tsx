@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useEngineState } from "@/hooks/useTemplateEngine";
 import { getMergedTemplate } from "@/lib/templateEngine";
-import { HeroEngine } from "./HeroEngine";
+import { HeroEngine, StyledCTA } from "./HeroEngine";
 import { Monitor, Smartphone, Tablet } from "lucide-react";
 
 export function CenterPanel() {
@@ -38,7 +38,7 @@ export function CenterPanel() {
       </div>
 
       <div className="flex-1 overflow-auto bf-scroll p-8 flex items-start justify-center">
-        <div className={`bf-browser w-full ${widthClass} transition-all duration-300`}>
+        <div className={`bf-browser bf-world w-full ${widthClass} transition-all duration-300`}>
           <div className="h-9 flex items-center gap-2 px-3 border-b bg-slate-50">
             <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
             <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
@@ -68,6 +68,8 @@ export function CenterPanel() {
               particleDensity={t.particleDensity ?? 80}
               stats={t.stats}
               photos={t.photos}
+              customImage={t.customBgImage}
+              buttonStyle={t.buttonStyle ?? "pill"}
             />
 
             {t.sectionVisibility?.stats !== false && (
@@ -84,12 +86,12 @@ export function CenterPanel() {
             )}
 
             {t.sectionVisibility?.services !== false && (
-              <section className="px-10 py-16 bg-slate-50 border-t bf-section-rise" style={{ animationDelay: "120ms" }}>
+              <section className="px-10 py-16 bg-slate-50 border-t bf-section-rise bf-tier" style={{ animationDelay: "120ms" }}>
                 <h2 className="text-3xl font-bold mb-2" style={{ fontFamily: t.headlineFont, color: "#0f172a" }}>What We Do</h2>
                 <p className="text-sm text-slate-600 mb-8" style={{ fontFamily: t.bodyFont }}>Services built for the {t.mood.replace(/-/g," ")} segment.</p>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-4 bf-deck">
                   {t.services.map((s, i) => (
-                    <div key={i} className="p-5 rounded-xl bg-white border hover:-translate-y-1 transition-transform" style={{ borderColor: t.primaryColor + "22" }}>
+                    <div key={i} className="bf-3d-card p-5 rounded-xl bg-white border" style={{ borderColor: t.primaryColor + "22", boxShadow: `0 24px 40px -22px ${t.primaryColor}55` }}>
                       <div className="w-10 h-10 rounded-lg mb-3 flex items-center justify-center text-white font-bold" style={{ background: `linear-gradient(135deg, ${t.primaryColor}, ${t.accentColor})` }}>
                         {String(i + 1).padStart(2, "0")}
                       </div>
@@ -116,14 +118,14 @@ export function CenterPanel() {
             )}
 
             {/* Photo gallery — real pics from this template */}
-            <section className="px-10 py-12 bg-white border-t bf-section-rise" style={{ animationDelay: "210ms" }}>
+            <section className="px-10 py-12 bg-white border-t bf-section-rise bf-tier" style={{ animationDelay: "210ms" }}>
               <div className="flex items-end justify-between mb-4">
                 <h2 className="text-2xl font-bold" style={{ fontFamily: t.headlineFont }}>Recent Projects</h2>
                 <span className="text-[10px] uppercase tracking-widest text-slate-500">{t.photos.length} photos</span>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-3 bf-deck">
                 {t.photos.slice(0, 6).map((src, i) => (
-                  <div key={src + i} className="relative aspect-[4/3] rounded-xl overflow-hidden group">
+                  <div key={src + i} className="bf-3d-card relative aspect-[4/3] rounded-xl overflow-hidden group" style={{ boxShadow: `0 26px 50px -20px ${t.primaryColor}66` }}>
                     <img src={src} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: `linear-gradient(180deg, transparent, ${t.primaryColor}cc)` }} />
                   </div>
@@ -137,9 +139,7 @@ export function CenterPanel() {
                   <div className="text-xl font-bold mb-1" style={{ fontFamily: t.headlineFont }}>{t.name}</div>
                   <div className="text-xs opacity-80">© {new Date().getFullYear()} · {t.industry}</div>
                 </div>
-                <button className="px-5 py-2.5 rounded-full bg-white text-sm font-semibold" style={{ color: t.primaryColor }}>
-                  {t.ctaLabel}
-                </button>
+                <StyledCTA label={t.ctaLabel} primary={t.accentColor} accent={t.primaryColor} style={t.buttonStyle ?? "pill"} />
               </div>
             </footer>
           </div>

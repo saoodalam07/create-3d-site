@@ -15,6 +15,8 @@ export interface Customizations {
   subline?: string;
   ctaLabel?: string;
   extraPhotos?: string[];
+  customBgImage?: string;
+  buttonStyle?: "pill" | "hex" | "square" | "neon" | "glass" | "split";
 }
 
 export interface EngineState {
