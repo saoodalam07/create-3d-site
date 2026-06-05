@@ -1,18 +1,62 @@
 import { useEngineState } from "@/hooks/useTemplateEngine";
 import { getMergedTemplate, setCustomization, resetCustomization, undo, downloadHTML, previewHTML, addPhoto, removePhoto } from "@/lib/templateEngine";
 import type { BackgroundType } from "@/lib/templates";
-import { Undo2, RotateCcw, Wand2, Download, ExternalLink, HardHat, Type, Image as ImageIcon, Plus, Trash2, PaintBucket, Layers, Settings2 } from "lucide-react";
-import { useState } from "react";
+import { Undo2, RotateCcw, Wand2, Download, ExternalLink, HardHat, Type, Image as ImageIcon, Plus, Trash2, PaintBucket, Layers, Settings2, Upload, MousePointerClick } from "lucide-react";
+import { useRef, useState } from "react";
 
 const FONT_OPTIONS = ["Space Grotesk","Syne","Outfit","Sora","Urbanist","Instrument Serif","DM Serif Display","Cormorant","Bebas Neue","Archivo Black","Inter","DM Sans","Manrope","Work Sans","IBM Plex Sans","Karla","Nunito Sans","Hind","Cabin","Plus Jakarta Sans"];
-const BG_OPTIONS: BackgroundType[] = ["particle-network","geometric-mesh","aurora","floating-shapes","video-loop","noise-grid","construction-3d","waterfall-3d","photo-parallax"];
+const BG_OPTIONS: BackgroundType[] = ["particle-network","geometric-mesh","aurora","floating-shapes","noise-grid","construction-3d","waterfall-3d","photo-parallax","isometric-city","neon-grid","blueprint","skyline-night","custom-image"];
+
+const PALETTES: { name: string; colors: [string, string, string] }[] = [
+  { name: "Construction",  colors: ["#f59e0b", "#1f2937", "#fde047"] },
+  { name: "Steel",         colors: ["#475569", "#0f172a", "#38bdf8"] },
+  { name: "Sunset",        colors: ["#ff6b35", "#7a1f3d", "#fbbf24"] },
+  { name: "Forest",        colors: ["#166534", "#052e16", "#84cc16"] },
+  { name: "Royal",         colors: ["#4338ca", "#1e1b4b", "#a78bfa"] },
+  { name: "Neon Cyber",    colors: ["#06b6d4", "#0b1226", "#ec4899"] },
+  { name: "Coral",         colors: ["#ef4444", "#7f1d1d", "#fbbf24"] },
+  { name: "Mint",          colors: ["#10b981", "#064e3b", "#a7f3d0"] },
+  { name: "Royal Gold",    colors: ["#1e3a8a", "#0f172a", "#facc15"] },
+  { name: "Sakura",        colors: ["#ec4899", "#831843", "#fda4af"] },
+  { name: "Slate Mono",    colors: ["#1f2937", "#0f172a", "#94a3b8"] },
+  { name: "Tropical",      colors: ["#0ea5e9", "#065f46", "#fde047"] },
+];
+
+const BUTTON_STYLES: { id: "pill" | "hex" | "square" | "neon" | "glass" | "split"; label: string }[] = [
+  { id: "pill", label: "Pill" },
+  { id: "hex", label: "Hex" },
+  { id: "square", label: "Brutal" },
+  { id: "neon", label: "Neon" },
+  { id: "glass", label: "Glass" },
+  { id: "split", label: "Split" },
+];
 
 export function RightPanel() {
   const { activeTemplate, templateHistory } = useEngineState();
   const t = getMergedTemplate();
   const [photoUrl, setPhotoUrl] = useState("");
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const bgFileRef = useRef<HTMLInputElement | null>(null);
 
   const update = (k: string, v: unknown) => setCustomization(activeTemplate, { [k]: v } as never);
+
+  const handleUploadPhoto = (file?: File) => {
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = () => { if (typeof r.result === "string") addPhoto(r.result); };
+    r.readAsDataURL(file);
+  };
+  const handleUploadBg = (file?: File) => {
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = () => {
+      if (typeof r.result === "string") {
+        update("customBgImage", r.result);
+        update("backgroundType", "custom-image");
+      }
+    };
+    r.readAsDataURL(file);
+  };
 
   return (
     <aside className="w-[340px] shrink-0 bf-panel border-l border-[var(--panel-border)] flex flex-col h-screen relative">
@@ -42,6 +86,22 @@ export function RightPanel() {
             <ColorField label="Secondary" value={t.secondaryColor} onChange={(v) => update("secondaryColor", v)} />
             <ColorField label="Accent" value={t.accentColor} onChange={(v) => update("accentColor", v)} />
           </div>
+          <div className="text-[9px] uppercase tracking-widest text-[var(--panel-muted)] mt-3 mb-1">Quick Palettes</div>
+          <div className="grid grid-cols-3 gap-1.5">
+            {PALETTES.map((p) => (
+              <button
+                key={p.name}
+                onClick={() => { update("primaryColor", p.colors[0]); update("secondaryColor", p.colors[1]); update("accentColor", p.colors[2]); }}
+                title={p.name}
+                className="group rounded-md overflow-hidden border border-[var(--panel-border)] hover:border-[var(--primary)] transition-colors"
+              >
+                <div className="flex h-6">
+                  {p.colors.map((c) => <div key={c} className="flex-1" style={{ background: c }} />)}
+                </div>
+                <div className="text-[9px] py-0.5 text-center text-[var(--panel-muted)] group-hover:text-[var(--panel-foreground)] truncate">{p.name}</div>
+              </button>
+            ))}
+          </div>
         </Section>
 
         <Section label="Typography" icon={<Type className="w-3 h-3" />}>
@@ -53,6 +113,19 @@ export function RightPanel() {
           <TextField label="Headline" value={t.headline} onChange={(v) => update("headline", v)} />
           <TextArea label="Subline" value={t.subline} onChange={(v) => update("subline", v)} />
           <TextField label="CTA Button" value={t.ctaLabel} onChange={(v) => update("ctaLabel", v)} />
+        </Section>
+
+        <Section label="Button Style" icon={<MousePointerClick className="w-3 h-3" />}>
+          <div className="grid grid-cols-3 gap-1.5">
+            {BUTTON_STYLES.map((b) => {
+              const active = (t.buttonStyle ?? "pill") === b.id;
+              return (
+                <button key={b.id} onClick={() => update("buttonStyle", b.id)} className={`text-[10px] font-bold uppercase tracking-wider px-2 py-2 rounded-md border transition-all ${active ? "border-[var(--primary)] bg-[var(--panel-hover)] text-[var(--panel-foreground)] shadow-[0_0_0_2px_var(--primary)_inset]" : "border-[var(--panel-border)] text-[var(--panel-muted)] hover:bg-[var(--panel-hover)]"}`}>
+                  {b.label}
+                </button>
+              );
+            })}
+          </div>
         </Section>
 
         <Section label="Photo Gallery" icon={<ImageIcon className="w-3 h-3" />}>
@@ -82,6 +155,10 @@ export function RightPanel() {
               <Plus className="w-3.5 h-3.5" /> Add
             </button>
           </div>
+          <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => handleUploadPhoto(e.target.files?.[0] ?? undefined)} />
+          <button onClick={() => fileRef.current?.click()} className="w-full mt-1 flex items-center justify-center gap-2 py-2 rounded-md border-2 border-dashed border-[var(--panel-border)] text-xs text-[var(--panel-foreground)] hover:bg-[var(--panel-hover)]">
+            <Upload className="w-3.5 h-3.5" /> Upload from device
+          </button>
         </Section>
 
         <Section label="3D & Motion" icon={<Settings2 className="w-3 h-3" />}>
@@ -101,6 +178,18 @@ export function RightPanel() {
               );
             })}
           </div>
+          <input ref={bgFileRef} type="file" accept="image/*" hidden onChange={(e) => handleUploadBg(e.target.files?.[0] ?? undefined)} />
+          <button onClick={() => bgFileRef.current?.click()} className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 rounded-md text-xs font-bold uppercase tracking-wider text-white" style={{ background: "var(--gradient-primary)" }}>
+            <Upload className="w-3.5 h-3.5" /> Upload Background Photo
+          </button>
+          {t.customBgImage && (
+            <div className="mt-2 relative aspect-video rounded-md overflow-hidden border border-[var(--panel-border)]">
+              <img src={t.customBgImage} alt="" className="w-full h-full object-cover" />
+              <button onClick={() => { update("customBgImage", undefined); update("backgroundType", "aurora"); }} className="absolute top-1 right-1 p-1 rounded bg-black/70 text-white" aria-label="Remove background">
+                <Trash2 className="w-3 h-3" />
+              </button>
+            </div>
+          )}
         </Section>
 
         <Section label="Sections">
